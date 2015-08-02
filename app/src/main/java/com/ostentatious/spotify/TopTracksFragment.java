@@ -45,8 +45,14 @@ public class TopTracksFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.fragment_top_tracks, container, false);
         ListView listView = (ListView) rootView.findViewById(R.id.song_listView);
 
+        Bundle arguments = getArguments();
+        if (arguments != null) {
+            id = arguments.getString(Intent.EXTRA_TEXT);
+        } else {
+            id = getActivity().getIntent().getStringExtra(Intent.EXTRA_TEXT);
+        }
+
         trackList = new TrackAdapter(getActivity(), R.layout.song_list, new ArrayList<Track>());
-        id = getActivity().getIntent().getStringExtra(Intent.EXTRA_TEXT);
         trackFetcher = new FetchDataTask();
         trackFetcher.execute();
 

@@ -16,7 +16,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         if(mTwoPane && savedInstanceState == null) {
             getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.tracks_fragment, new TopTracksFragment(), FRAGMENT_TAG)
+                    .replace(R.id.tracks_pane, new TopTracksFragment(), FRAGMENT_TAG)
                     .commit();
         }
     }

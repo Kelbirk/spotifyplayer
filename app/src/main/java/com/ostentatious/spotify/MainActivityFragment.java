@@ -64,9 +64,23 @@ public class MainActivityFragment extends Fragment {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                boolean mTwoPane = getResources().getBoolean(R.bool.large_layout);
                 Artist artist = artistList.getItem(position);
-                Intent intent = new Intent(getActivity(), TopTracks.class).putExtra(Intent.EXTRA_TEXT, artist.id);
-                startActivity(intent);
+                if(mTwoPane) {
+                    Bundle args = new Bundle();
+                    args.putString(Intent.EXTRA_TEXT, artist.id);
+
+                    TopTracksFragment fragment = new TopTracksFragment();
+                    fragment.setArguments(args);
+
+                    getActivity().getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.tracks_pane, fragment, "fragment")
+                            .commit();
+                }
+                else {
+                    Intent intent = new Intent(getActivity(), TopTracks.class).putExtra(Intent.EXTRA_TEXT, artist.id);
+                    startActivity(intent);
+                }
             }
         });
 
