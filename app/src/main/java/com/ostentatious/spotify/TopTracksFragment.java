@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,10 +30,9 @@ import retrofit.RetrofitError;
  */
 public class TopTracksFragment extends Fragment {
 
-    private TrackAdapter trackList;
     private String id;
     boolean mIsLargeLayout;
-    boolean playing;
+    private TrackAdapter trackList;
 
     private AsyncTask<String, Integer, Tracks> trackFetcher;
     public TopTracksFragment() {
@@ -55,7 +55,6 @@ public class TopTracksFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long identification) {
                 FragmentManager fm = getActivity().getSupportFragmentManager();
-                Track track = trackList.getItem(position);
                 PlayerFragment newFragment = PlayerFragment.newInstance(trackList.tracks, position);
                 if (mIsLargeLayout) {
                     // The device is using a large layout, so show the fragment as a dialog
@@ -99,6 +98,9 @@ public class TopTracksFragment extends Fragment {
                 trackList.clear();
                 trackList.addAll(tracks.tracks);
                 trackList.notifyDataSetChanged();
+            }
+            else {
+                Toast.makeText(getActivity(), "Top tracks are unavailable for this artist", Toast.LENGTH_SHORT).show();
             }
         }
     }

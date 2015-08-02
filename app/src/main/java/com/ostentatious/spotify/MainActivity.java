@@ -7,10 +7,19 @@ import android.view.MenuItem;
 
 public class MainActivity extends AppCompatActivity {
 
+    public boolean mTwoPane;
+    static final String FRAGMENT_TAG = "top tracks";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        mTwoPane = getResources().getBoolean(R.bool.large_layout);
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        if(mTwoPane && savedInstanceState == null) {
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.tracks_fragment, new TopTracksFragment(), FRAGMENT_TAG)
+                    .commit();
+        }
+        else
+            setContentView(R.layout.activity_main);
     }
 
 

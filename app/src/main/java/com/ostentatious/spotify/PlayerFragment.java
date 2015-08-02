@@ -30,13 +30,14 @@ import kaaes.spotify.webapi.android.models.Track;
  */
 public class PlayerFragment extends DialogFragment {
 
-    String id;
     private TextView artistName;
     private TextView albumName;
     private ImageView albumImage;
+    private boolean killRunnable;
     private MediaPlayer mediaPlayer;
     private boolean playing = true;
     private int position;
+    private TextView progressText;
     private SeekBar seekBar;
     private TextView trackName;
     private List<Track> tracks;
@@ -65,6 +66,7 @@ public class PlayerFragment extends DialogFragment {
         artistName = (TextView) rootView.findViewById(R.id.artist_track_textView);
         albumName = (TextView) rootView.findViewById(R.id.album_track_textView);
         trackName = (TextView) rootView.findViewById(R.id.track_name_textView);
+        progressText = (TextView) rootView.findViewById(R.id.track_progress_textView);
         albumImage = (ImageView) rootView.findViewById(R.id.album_track_imageView);
         seekBar = (SeekBar) rootView.findViewById(R.id.seekBar);
 
@@ -82,10 +84,12 @@ public class PlayerFragment extends DialogFragment {
             public void run() {
                 if (mediaPlayer != null) {
                     int mCurrentPosition = mediaPlayer.getCurrentPosition() / 1000;
-                    Log.e("Test:", Integer.toString(mCurrentPosition));
                     seekBar.setProgress(mCurrentPosition);
                     seekBar.refreshDrawableState();
+                    progressText.setText(Integer.toString(mCurrentPosition));
                 }
+                if (killRunnable)
+                    mHandler.removeCallbacks(this);
                 mHandler.postDelayed(this, 1000);
             }
         });
@@ -94,6 +98,7 @@ public class PlayerFragment extends DialogFragment {
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
             }
+
             @Override
             public void onStartTrackingTouch(SeekBar seekBar) {
             }
@@ -150,6 +155,18 @@ public class PlayerFragment extends DialogFragment {
         });
 
         return rootView;
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        killRunnable = true;
+        mediaPlayer.reset();
+    }
+
+    @Override public void onResume() {
+        super.onResume();
+        killRunnable = false;
     }
 
     /** The system calls this only when creating the layout in a dialog. */

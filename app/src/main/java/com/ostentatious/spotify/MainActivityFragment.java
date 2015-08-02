@@ -1,11 +1,15 @@
 package com.ostentatious.spotify;
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +24,7 @@ import kaaes.spotify.webapi.android.SpotifyApi;
 import kaaes.spotify.webapi.android.SpotifyService;
 import kaaes.spotify.webapi.android.models.Artist;
 import kaaes.spotify.webapi.android.models.ArtistsPager;
+import retrofit.RetrofitError;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -68,20 +73,31 @@ public class MainActivityFragment extends Fragment {
         searchBar.addTextChangedListener(new TextWatcher() {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if(!s.toString().isEmpty())
-                {
+                if (!s.toString().isEmpty()) {
                     updateData(s.toString());
                 }
             }
+
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
             }
+
             @Override
             public void afterTextChanged(Editable s) {
             }
         });
 
+        if (isNetworkAvailable() == false)
+            Toast.makeText(getActivity(), "No network found", Toast.LENGTH_SHORT).show();
+
         return rootView;
+    }
+
+    private boolean isNetworkAvailable() {
+        ConnectivityManager connectivityManager
+                = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
+        return activeNetworkInfo != null && activeNetworkInfo.isConnected();
     }
 
     private class FetchDataTask extends AsyncTask<String, Integer, ArtistsPager> {
@@ -89,8 +105,13 @@ public class MainActivityFragment extends Fragment {
 
             SpotifyApi api = new SpotifyApi();
             SpotifyService spotify = api.getService();
-
-            return spotify.searchArtists(params[0]);
+            try {
+                return spotify.searchArtists(params[0]);
+            }
+            catch (RetrofitError e) {
+                Log.e("Error:", e.getMessage());
+            }
+            return null;
         }
         @Override
         protected void onPostExecute(ArtistsPager artists) {
